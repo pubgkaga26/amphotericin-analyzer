@@ -45,6 +45,38 @@ def analyze_amphotericin(smiles_string):
 def main():
     st.set_page_config(page_title="Amphotericin B Stereochemistry Analysis", page_icon="🧬", layout="centered")
     
+    st.markdown(
+        """
+        <style>
+        .student-info {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            text-align: right;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+            z-index: 9999;
+            font-size: 14px;
+        }
+        /* Handle dark mode gracefully */
+        @media (prefers-color-scheme: dark) {
+            .student-info {
+                background-color: rgba(0, 0, 0, 0.3);
+                box-shadow: 0px 2px 5px rgba(255,255,255,0.05);
+            }
+        }
+        </style>
+        <div class="student-info">
+            <b>Name:</b> Vijay Thomas<br>
+            <b>Class:</b> AIML-A<br>
+            <b>Roll No:</b> RA2511026050006
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
     st.title("🧬 Amphotericin B Stereochemistry Analyzer")
     st.markdown("""
     This app analyzes the stereochemistry of Amphotericin B (or any other molecule) using [RDKit](https://www.rdkit.org/).
