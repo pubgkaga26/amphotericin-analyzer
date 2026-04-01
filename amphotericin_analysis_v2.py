@@ -50,7 +50,7 @@ def main():
         <style>
         .student-info {
             position: fixed;
-            top: 15px;
+            top: 70px;
             right: 20px;
             text-align: right;
             background-color: rgba(255, 255, 255, 0.1);
