@@ -1,0 +1,92 @@
+import streamlit as st
+from rdkit import Chem
+import pandas as pd
+from rdkit.Chem.Draw import rdMolDraw2D
+import base64
+
+def draw_molecule_svg(mol):
+    d2d = rdMolDraw2D.MolDraw2DSVG(400, 300)
+    d2d.DrawMolecule(mol)
+    d2d.FinishDrawing()
+    return d2d.GetDrawingText()
+
+def analyze_amphotericin(smiles_string):
+    """Analyzes the stereochemistry of a molecule using RDKit."""
+    # Load correctly defined molecule from isomeric SMILES
+    mol = Chem.MolFromSmiles(smiles_string)
+    
+    if mol is None:
+        return None, "Error: Could not parse the SMILES string."
+
+    # 1. Add hydrogens properly (necessary for full stereochemistry assignment)
+    mol_with_hs = Chem.AddHs(mol)
+    # 2. Assign stereochemistry properly using RDKit's internal CIP rules
+    Chem.AssignStereochemistry(mol_with_hs, force=True, cleanIt=True)
+    
+    # 3. Identify all chiral centers
+    chiral_centers = Chem.FindMolChiralCenters(mol_with_hs, includeUnassigned=True)
+    
+    # Create Dataframe
+    data = []
+    has_unassigned = False
+    
+    for atom_idx, config in chiral_centers:
+        atom = mol_with_hs.GetAtomWithIdx(atom_idx)
+        element = atom.GetSymbol()
+        data.append({"Atom Index": atom_idx, "Element": element, "Configuration": config})
+        
+        if config == "?":
+            has_unassigned = True
+            
+    df = pd.DataFrame(data)
+    
+    return mol, df, has_unassigned
+
+def main():
+    st.set_page_config(page_title="Amphotericin B Stereochemistry Analysis", page_icon="🧬", layout="centered")
+    
+    st.title("🧬 Amphotericin B Stereochemistry Analyzer")
+    st.markdown("""
+    This app analyzes the stereochemistry of Amphotericin B (or any other molecule) using [RDKit](https://www.rdkit.org/).
+    It identifies all local chiral centers and outputs their CIP classifications.
+    """)
+    
+    # Hardcoded stereochemically defined SMILES string for Amphotericin B
+    default_smiles = (
+        "C[C@H]1[C@@H]([C@H](C[C@H](O1)O[C@@H]2[C@H]([C@@H](C[C@H](O2)C(=O)O)O)N)O)O"
+        "[C@H]3/C=C/C=C/C=C/C=C/C=C/C=C/C=C/[C@@H](C[C@H]4[C@@H]([C@@H](O4)C)[C@@H]"
+        "([C@@H](C[C@H](C[C@@H](C[C@@H](CC(=O)O[C@@H]([C@H]([C@H]3O)C)C)O)O)O)O)O)O"
+    )
+
+    smiles_input = st.text_area("Input SMILES String:", default_smiles, height=100)
+    
+    if st.button("Analyze Stereochemistry", type="primary"):
+        with st.spinner("Analyzing..."):
+            mol, df, has_unassigned = analyze_amphotericin(smiles_input)
+            
+            if mol is None:
+                st.error(df) # Here df is the error message
+            else:
+                st.success("Analysis Complete!")
+                
+                col1, col2 = st.columns([1, 1])
+                
+                with col1:
+                    st.subheader("2D Structure")
+                    svg_string = draw_molecule_svg(mol)
+                    b64 = base64.b64encode(svg_string.encode('utf-8')).decode('utf-8')
+                    html = f'<img src="data:image/svg+xml;base64,{b64}" width="100%">'
+                    st.markdown(html, unsafe_allow_html=True)
+                
+                with col2:
+                    st.subheader("Stereocenters")
+                    st.metric("Total Chiral Centers", len(df))
+                    st.dataframe(df, use_container_width=True)
+                
+                if has_unassigned:
+                    st.warning("⚠️ Some stereocenters remain unassigned (?) due to incomplete SMILES metadata.")
+                else:
+                    st.info("✅ Stereochemistry fully resolved.")
+                    
+if __name__ == "__main__":
+    main()
