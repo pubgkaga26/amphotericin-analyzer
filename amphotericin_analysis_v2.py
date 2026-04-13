@@ -83,6 +83,33 @@ def main():
     It identifies all local chiral centers and outputs their CIP classifications.
     """)
     
+    st.markdown("---")
+    st.markdown("## 📚 Educational Guide:\n## Stereochemistry Basics")
+    
+    with st.expander("What is Stereochemistry & Chirality?"):
+        st.markdown("""
+        **Stereochemistry** is the study of the three-dimensional arrangement of atoms in molecules.
+        
+        **Chirality** refers to the property of a molecule that makes it non-superimposable on its mirror image (like your left and right hands). A carbon atom bonded to four different groups is a common chiral center.
+        """)
+        
+    with st.expander("Determining R/S Configuration (CIP Rules)"):
+        st.markdown("""
+        The **Cahn-Ingold-Prelog (CIP) sequence rules** are used to assign R/S configurations:
+        1. **Assign priorities** to the four groups attached to the stereocenter based on atomic number (highest atomic number = 1).
+        2. **Orient the molecule** so the lowest priority group (4) points away.
+        3. **Determine the direction** of groups 1 → 2 → 3:
+           - **Clockwise** = **R** (Rectus)
+           - **Counterclockwise** = **S** (Sinister)
+        """)
+        
+    with st.expander("About the Example Compound"):
+        st.markdown("""
+        **Amphotericin B** is a potent antifungal medication. It's a polyene macrolide containing numerous chiral centers along its rigid macrocyclic ring. The precise 3D configuration of all these stereocenters is critical to how the molecule inserts into fungal cell membranes to form pores, leading to cell death. Identifying and correctly assigning every single center is a major challenge in chemical analysis!
+        """)
+    
+    st.markdown("---")
+
     # Hardcoded stereochemically defined SMILES string for Amphotericin B
     default_smiles = (
         "C[C@H]1[C@@H]([C@H](C[C@H](O1)O[C@@H]2[C@H]([C@@H](C[C@H](O2)C(=O)O)O)N)O)O"
